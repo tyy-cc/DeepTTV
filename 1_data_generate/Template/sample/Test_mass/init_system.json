@@ -1,0 +1,25 @@
+{
+    "system_name": "Test-1",
+        "body":[
+        { "name":"TSun", "rigid": false, "mass":0.99, "position": [0, 0, 0], "velocity": [0, 0, 0], "radius":624042.9},
+        { "name":"c", "rigid": false, "mass": 1.00557E-04, "orbital_elements": [0.116675E+00, 0.428437E-03, 1E-06, 0, 2.8333, 0.87258], "center_mass": 0.956, "radius": 6995},
+        { "name":"d", "rigid": false, "mass": 1.00557E-04, "orbital_elements": [0.116675E+00, 0.428437E-03, 1E-06, 0, 2.8333, 0.87258], "center_mass": 0.956, "radius": 5026}
+
+    ],
+    "current_time": 0.000,
+    "parameters":{
+        "tide"            : false,
+        "GR"              : false,
+        "step_size"       : 1e-5,
+        "save_interval"   : 100.0,
+        "output_gaps"     : 1,
+        "potential_order" : 2,
+        "coordinates"     : "central",
+        "scheme"          : "M42"
+    },
+
+    "output_format": {
+      "position": true,
+      "orbital_elements": true
+    }
+}

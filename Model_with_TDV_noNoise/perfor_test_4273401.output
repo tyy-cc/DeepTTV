@@ -1,0 +1,36 @@
+cuda
+Finished reading data from pkl
+labels_min: [0.11759813217238088, 3.0027148913606952e-05, 0.010000064067839095, 0.000836680925788275]
+labels_max: [4.9999967896181285, 0.009547917192519146, 0.09999976616806375, 0.13439008159885563]
+ttv_min: -51.350979523016576, ttv_max: 36.733603674572805
+tdv_min: -0.49990404028366736, tdv_max: 0.4880428854907505
+transit_time_min=0.02984863756018715, transit_time_max=4.065846427115524
+After scaling max ttv:  36.733603674572805  min ttv:  -51.350979523016576
+max transit time:  4.065846427115524  min transit_time:  0.02984863756018715
+max scaled tdv:  48.804288549075046  min scaled tdv:  -49.99040402836673
+input1 shape: (1847932, 135, 3)
+input2 shape: (1847932, 1, 2)
+[[ 0.45245044 -0.04575933]]
+target shape: (1847932, 4)
+max true label of a_nont: 4.9999967896181285, min true label of a_nont: 0.11759813217238088
+max scaled a_nont: 1.0, min scaled a_nont: 0.0
+max true label of m_nont: 0.009547917192519146, min true label of m_nont: 3.0027148913606952e-05
+max scaled m_nont: 1.0, min scaled m_nont: 0.0
+max true label of e_nont: 0.09999976616806375, min true label of e_nont: 0.010000064067839095
+max scaled e_nont: 1.0, min scaled e_nont: 0.0
+max true label of incli_nont: 0.13439008159885563, min true label of incli_nont: 0.000836680925788275
+max scaled incli_nont: 1.0, min scaled incli_nont: 0.0
+data shape is torch.Size([1810973, 135, 3]), torch.Size([18480, 135, 3]), torch.Size([18479, 135, 3])
+(18479, 4)
+(1,)
+(1,)
+(1,)
+For 3AU ~ 1 M_J case, frac err is [[0.00330466 0.00234802 0.00775255 0.00965404]]. 
+       The true values are [[3.02548248 0.99238825 0.07464702 6.5460131 ]] 
+       The predicted value are [[3.01548429 0.9900581  0.07522572 6.48281762]].
+For 3AU ~ 5 M_J case, frac err is [[0.0054409  0.00111079 0.01220449 0.00349463]].
+       The true values are [[2.99323854 4.98249868 0.04616611 6.04087812]] 
+       The predicted value are [[2.97695263 4.97696419 0.04560267 6.06198878]].
+For 0.3 AU ~ 15 M_E case, frac err is [[0.10568353 0.3599668  0.14547754 0.01589162]].
+       The true values are [[ 0.17821958 17.7183198   0.03805342  7.35013384]] 
+       The predicted value are [[ 0.19705446 24.09632669  0.04358934  7.23332833]].
