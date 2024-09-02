@@ -1,4 +1,0 @@
-Running "module reset". Resetting modules to system default. The following $MODULEPATH directories have been removed: None
-A conda environment has been detected CONDA_PREFIX=
-/sw/external/python/anaconda3 
-anaconda3_cpu is loaded. Consider running conda deactivate and reloading it.
