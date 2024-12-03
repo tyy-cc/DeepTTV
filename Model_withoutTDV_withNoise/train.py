@@ -11,7 +11,7 @@ import re
 import os
 import pandas as pd
 import pickle
-from train_utils import * #get_train_data, get_tensor_training_data, train_and_eval, print_model_para, predict, create_mask, predict_from_obs, predict_from_obs_inter
+from train_utils import * 
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 import sys 
@@ -20,6 +20,7 @@ import time
 from sklearn.preprocessing import MinMaxScaler
 import transformers as tf
 from timeit import default_timer as timer
+from models.gru_vis_trans import TransAm
 
 #### training data ######
 INCLUDE_APM = False
@@ -34,14 +35,11 @@ SCALE_OUTPUT = 'MinMax01'
 
 LABEL_WANTED = ['a_nont', 'm_nont', 'e_nont']
 LABEL_PRED = ['a_nont', 'm_nont', 'e_nont']
-              # 'm_t', 'm_nont', 
-              # 'e_nont',
-              # 'i_t', 'i_nont', 
-              # 'cos(o_t)', 'sin(o_t)', 'cos(o_nont)', 'sin(o_nont)', 
-              # 'cos(O_nont)', 'sin(O_nont)', 
-              # 'cos(Mean_ano_nont)', 'sin(Mean_ano_nont)']
 
-TRAINING_DATA_FILE = '/scratch/bboy/cchen4/Kepler88/data/kepler88_obs_2016_para2013_Data_3_12_tdv_0.5_aver_corrected_ttv1Min.pkl' 
+"""
+ADD YOUR DATA PATH BELOW AT TRAINING_DATA_FILE
+"""
+TRAINING_DATA_FILE = '[[YOUR PATH]]/kepler88_obs_2016_para2013_Data_3_12_tdv_0.5_aver_corrected_ttv1Min.pkl' 
 
 torch.manual_seed(0)
 np.random.seed(0)
@@ -50,10 +48,6 @@ cwd = os.getcwd()
 cwd = str(cwd)
 
 start_time = time.time()
-main_path = '/scratch/bboy/cchen4/Kepler88/add_noise' 
-sys.path.insert(1, main_path)
-
-from models.gru_vis_trans import TransAm
 
 ######## check device ########
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -123,7 +117,7 @@ case_name = 'BATCH_' + str(BATCH_SIZE) + '_LR_' + str(LR) + \
             '_inScale_' + str(SCALE_INPUT) + '_outScale_' + str(SCALE_OUTPUT) + \
             '_initLinear_' + INIT_LINEAR + '_initRNN_' + INIT_RNN + '_warmup_' + str(WARMUP) + \
             '_multiDeco_' + str(multi_deco) + '_warmupPerc_' + str(warmup_per) + '_minLR_' + str(Min_LR)
-writer = SummaryWriter(main_path + '/runs/' + case_name)
+writer = SummaryWriter(cwd + '/runs/' + case_name)
 
 train_loader = Data.DataLoader(dataset=torch_dataset_train, batch_size= BATCH_SIZE, shuffle=True)
 eva_loader = Data.DataLoader(dataset=torch_dataset_eva, batch_size= BATCH_SIZE, shuffle=True)
@@ -262,19 +256,11 @@ else:
     true_label = target_test * label_max
     true_preds = preds * label_max
 
-# true_label[:, 1] /= Earth_in_Solar
+
 true_label[:, 1] /= Earth_in_Solar
 true_preds[:, 1] /= Earth_in_Solar
-# true_preds[:, 1] /= Earth_in_Solar
-# true_preds[:, 2] /= Earth_in_Solar
 
 x_labels = ['AU', 'M_Earth', '', 'rad']
-#             'M_Earth', 'M_Earth',
-#             '',
-#             'rad', 'rad',
-#             'cos', 'sin', 'cos', 'sin',
-#             'cos', 'sin',
-#             'cos', 'sin']
 
 fig, axs1 = plt.subplots(7, 2,figsize=(25, 55))
 print(len(x_labels), preds.shape)
@@ -331,94 +317,15 @@ plt.savefig(cwd + '/abs_err.png', bbox_inches='tight')
 plt.close()
 
 total_mean_frac_err = sum(mean_frac_err_list)
-print('mean frac err:', mean_frac_err_list)#, sec_mae, third_mae, four_mae, five_mae)
-print('med frac err:',  med_frac_err_list)#, sec_mae_med, third_mae_med, four_mae_med, five_mae_med)
+print('mean frac err:', mean_frac_err_list)
+print('med frac err:',  med_frac_err_list)
 print(f'std of frac err: {std_frac_err_list}')
 print('mean abs err:', mean_abs_err_list)
 print('med abs err:', med_abs_err_list)
 print(f'std of abs err: {std_abs_err_list}')
 
 
-'''
-convert cos, sin to degree, start from inclination
-'''
-# to_deg_frac_err_list = []
-# to_deg_abs_err_list = []
-
-# to_deg_mean_frac_err_list = []
-# to_deg_med_frac_err_list = []
-# to_deg_std_frac_err_list = []
-
-# to_deg_mean_abs_err_list = []
-# to_deg_med_abs_err_list = []
-# to_deg_std_abs_err_list = []
-
-# fig, axs1 = plt.subplots(2, 2,figsize=(12, 20))
-# fig_count = 0
-# for i in range(len(preds[0])):
-#   if i >=6 and i % 2 ==0:
-#     cos_pred = true_preds[:, i]
-#     sin_pred = true_preds[:, i+1]
-#     deg_pred = np.arctan2(sin_pred, cos_pred) * 180 / np.pi
-
-#     cos_true = true_label[:, i]
-#     sin_true = true_label[:, i+1]
-#     deg_label = np.arctan2(sin_true, cos_true) * 180 / np.pi
-#   # elif i == 4 or i == 5:
-#   #   deg_pred = np.arccos(true_preds[:, i]) * 180 / np.pi 
-#   #   deg_label = np.arccos(true_label[:, i]) * 180 / np.pi 
-#   else:
-#     continue 
-
-#   frac_err_temp = np.absolute((deg_label - deg_pred)/(deg_label))
-#   abs_err_temp = np.absolute((deg_label - deg_pred))
-
-
-#   axs1[fig_count // 2][fig_count % 2].plot(deg_label, frac_err_temp , 'o', markersize=2, alpha=0.5)
-#   axs1[fig_count // 2][fig_count % 2].set_yscale('log')
-#   axs1[fig_count // 2][fig_count % 2].set_title('Predicted ' + LABEL_WANTED[6+fig_count], fontsize=15)
-#   axs1[fig_count // 2][fig_count % 2].set_xlabel('degree', fontsize=15)
-#   axs1[fig_count // 2][fig_count % 2].set_ylabel('Fractional Difference', fontsize=15)
-#   axs1[fig_count // 2][fig_count % 2].tick_params(axis='x', labelsize=14)
-#   axs1[fig_count // 2][fig_count % 2].tick_params(axis='y', labelsize=14)
-
-#   fig_count += 1
-
-#   mean_frac_err_temp = round(np.mean(frac_err_temp), 6)
-#   med_frac_err_temp = round(np.median(frac_err_temp), 6)
-#   std_frac_err_temp = round(np.std(frac_err_temp), 6)
-
-#   mean_abs_err_temp = round(np.mean(abs_err_temp), 6)
-#   med_abs_err_temp = round(np.median(abs_err_temp), 6)
-#   std_abs_err_temp = round(np.std(abs_err_temp), 6)
-
-#   to_deg_frac_err_list.append(frac_err_temp)
-#   to_deg_abs_err_list.append(abs_err_temp)
-
-#   to_deg_mean_frac_err_list.append(mean_frac_err_temp)
-#   to_deg_med_frac_err_list.append(med_frac_err_temp)
-#   to_deg_std_frac_err_list.append(std_frac_err_temp)
-
-#   to_deg_mean_abs_err_list.append(mean_abs_err_temp)
-#   to_deg_med_abs_err_list.append(med_abs_err_temp)
-#   to_deg_std_abs_err_list.append(std_abs_err_temp)
-# plt.savefig(cwd + '/frac_err_to_deg.png', bbox_inches='tight')
-# plt.close()
-
-
-# to_deg_total_mean_frac_err = sum(to_deg_mean_frac_err_list)
-# print('')
-# print('To deg:')
-# print('mean frac err:', to_deg_mean_frac_err_list)#, sec_mae, third_mae, four_mae, five_mae)
-# print('med frac err:',  to_deg_med_frac_err_list)#, sec_mae_med, third_mae_med, four_mae_med, five_mae_med)
-# print(f'std of frac err: {to_deg_std_frac_err_list}')
-# print('mean abs err:', to_deg_mean_abs_err_list)
-# print('med abs err:', to_deg_med_abs_err_list)
-# print(f'std of abs err: {to_deg_std_abs_err_list}')
-
-
 new_file = open(str(last_loss)+'_'+ str(eval_loss) + '_' +str(total_mean_frac_err) +'.txt', 'w')
-#new_file.write(str(num_lstm_layer) +'_'+ str(num_enc_layer) + '_' + str(feature_size)+'_'+str(NHEAD))
 new_file.close()
 
 print('total time used:', (time.time() - start_time)/60/60) # in hours
